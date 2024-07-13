@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Files</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div class="container">
+    <% if (directories.length > 0) { %>
+      <h1>Directories</h1>
+      <ul>
+        <% directories.forEach(directory => { %>
+          <li>
+            <form action="/files/<%= directory %>" method="get" style="display: inline;">
+              <input type="hidden" name="role" value="<%= role %>">
+              <button type="submit"><%= directory %></button>
+            </form>
+          </li>
+        <% }) %>
+      </ul>
+    <% } %>
+
+    <% if (files.length > 0) { %>
+      <h1>Files in <%= directory %></h1>
+      <ul>
+        <% files.forEach(file => { %>
+          <li>
+            <form action="/download/<%= directory %>/<%= file %>" method="get" style="display: inline;">
+              <button type="submit"><%= file %></button>
+            </form>
+          </li>
+        <% }) %>
+      </ul>
+    <% } %>
+    <a href="/dashboard" class="btn-link">Back to Dashboard</a>
+  </div>
+</body>
+</html>
