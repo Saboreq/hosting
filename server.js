@@ -7,6 +7,8 @@ const path = require('path');
 const fs = require('fs');
 const helmet = require('helmet');
 const session = require('express-session');
+const multer = require('multer');
+const upload = multer({ dest: path.join(__dirname, 'Files') });
 
 const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -74,46 +76,48 @@ app.post('/register', async (req, res) => {
 });
 
 app.get('/files', (req, res) => {
-    const { user } = req.session;
-    if (!user) {
-      return res.status(401).send('Unauthorized');
-    }
-    const filesPath = path.join(__dirname, 'Files');
-    const directories = fs.readdirSync(filesPath, { withFileTypes: true })
-      .filter(dirent => dirent.isDirectory())
-      .map(dirent => dirent.name);
-  
-    if (user.role === 'admin') {
-      res.render('files', { directories, files: [], role: user.role });
-    } else if (user.role === 'member') {
-      res.render('files', { directories: directories.filter(dir => dir === 'Public'), files: [], role: user.role });
-    } else {
-      res.status(403).send('Access denied');
-    }
-  });
+  const { user } = req.session;
+  if (!user) {
+    return res.status(401).send('Unauthorized');
+  }
+  const filesPath = path.join(__dirname, 'Files');
+  const directories = fs.readdirSync(filesPath, { withFileTypes: true })
+    .filter(dirent => dirent.isDirectory())
+    .map(dirent => dirent.name);
 
-  app.get('/files/:directory', (req, res) => {
-    const { user } = req.session;
-    if (!user) {
-      return res.status(401).send('Unauthorized');
-    }
-    const directory = req.params.directory;
-    const filesPath = path.join(__dirname, 'Files', directory);
-  
-    if (!fs.existsSync(filesPath)) {
-      return res.status(404).send('Directory not found');
-    }
-  
-    const files = fs.readdirSync(filesPath, { withFileTypes: true })
-      .filter(dirent => dirent.isFile())
-      .map(dirent => dirent.name);
-  
-    if (user.role === 'admin' || (user.role === 'member' && directory === 'Public')) {
-      res.render('files', { directories: [], files, directory, role: user.role });
-    } else {
-      res.status(403).send('Access denied');
-    }
-  });
+  const directory = ''; // Root directory or default directory
+
+  if (user.role === 'admin') {
+    res.render('files', { directories, files: [], role: user.role, directory });
+  } else if (user.role === 'member') {
+    res.render('files', { directories: directories.filter(dir => dir === 'Public'), files: [], role: user.role, directory });
+  } else {
+    res.status(403).send('Access denied');
+  }
+});
+
+app.get('/files/:directory', (req, res) => {
+  const { user } = req.session;
+  if (!user) {
+    return res.status(401).send('Unauthorized');
+  }
+  const directory = req.params.directory;
+  const filesPath = path.join(__dirname, 'Files', directory);
+
+  if (!fs.existsSync(filesPath)) {
+    return res.status(404).send('Directory not found');
+  }
+
+  const files = fs.readdirSync(filesPath, { withFileTypes: true })
+    .filter(dirent => dirent.isFile())
+    .map(dirent => dirent.name);
+
+  if (user.role === 'admin' || (user.role === 'member' && directory === 'Public')) {
+    res.render('files', { directories: [], files, directory, role: user.role });
+  } else {
+    res.status(403).send('Access denied');
+  }
+});
 
 app.get('/download/:directory/:file', (req, res) => {
   const { directory, file } = req.params;
@@ -127,6 +131,44 @@ app.get('/download/:directory/:file', (req, res) => {
     if (err) {
       res.status(500).send('Error downloading file');
     }
+  });
+});
+
+app.post('/upload', upload.single('file'), (req, res) => {
+  const { user } = req.session;
+  if (!user || user.role !== 'admin') {
+    return res.status(403).send('Access denied');
+  }
+
+  const { originalname, path: tempPath } = req.file;
+  const targetPath = path.join(__dirname, 'Files', req.body.directory, originalname);
+
+  fs.rename(tempPath, targetPath, err => {
+    if (err) {
+      return res.status(500).send('Error uploading file');
+    }
+    res.redirect(`/files/${req.body.directory}`);
+  });
+});
+
+app.post('/delete/:directory/:file', (req, res) => {
+  const { user } = req.session;
+  if (!user || user.role !== 'admin') {
+    return res.status(403).send('Access denied');
+  }
+
+  const { directory, file } = req.params;
+  const filePath = path.join(__dirname, 'Files', directory, file);
+
+  if (!fs.existsSync(filePath)) {
+    return res.status(404).send('File not found');
+  }
+
+  fs.unlink(filePath, err => {
+    if (err) {
+      return res.status(500).send('Error deleting file');
+    }
+    res.redirect(`/files/${directory}`);
   });
 });
 

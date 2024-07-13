@@ -28,10 +28,25 @@
             <form action="/download/<%= directory %>/<%= file %>" method="get" style="display: inline;">
               <button type="submit"><%= file %></button>
             </form>
+            <% if (role === 'admin') { %>
+              <form action="/delete/<%= directory %>/<%= file %>" method="post" style="display: inline;">
+                <button type="submit">Delete</button>
+              </form>
+            <% } %>
           </li>
         <% }) %>
       </ul>
     <% } %>
+
+    <% if (role === 'admin') { %>
+      <h2>Upload File</h2>
+      <form action="/upload" method="post" enctype="multipart/form-data">
+        <input type="file" name="file" required>
+        <input type="hidden" name="directory" value="<%= directory %>">
+        <button type="submit">Upload</button>
+      </form>
+    <% } %>
+
     <a href="/dashboard" class="btn-link">Back to Dashboard</a>
   </div>
 </body>
