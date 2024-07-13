@@ -8,6 +8,7 @@ const fs = require('fs');
 const helmet = require('helmet');
 const session = require('express-session');
 const multer = require('multer');
+const crypto = require('crypto');
 const upload = multer({ dest: path.join(__dirname, 'Files') });
 
 const app = express();
@@ -35,28 +36,36 @@ app.get('/register', (req, res) => {
 });
 
 app.get('/dashboard', (req, res) => {
-    const { user } = req.session;
-    if (!user) {
-      return res.status(401).send('Unauthorized');
-    }
-    res.render('dashboard', { username: user.username, role: user.role });
-  });
+  const { user } = req.session;
+  if (!user) {
+    return res.status(401).send('Unauthorized');
+  }
+  res.render('dashboard', { username: user.username, role: user.role });
+});
 
-  app.post('/login', async (req, res) => {
-    const { username, password } = req.body;
-    try {
-      const [rows] = await db.execute('SELECT * FROM users WHERE username = ?', [username]);
-      if (rows.length > 0 && await bcrypt.compare(password, rows[0].password)) {
-        const role = rows[0].role;
-        req.session.user = { username, role };
-        res.render('dashboard', { username, role });
-      } else {
-        res.status(401).send('Invalid credentials');
-      }
-    } catch (error) {
-      res.status(500).send('Error during login');
+app.get('/admin-panel', (req, res) => {
+  const { user } = req.session;
+  if (!user || user.role !== 'admin') {
+    return res.status(403).send('Access denied');
+  }
+  res.render('adminPanel');
+});
+
+app.post('/login', async (req, res) => {
+const { username, password } = req.body;
+  try {
+    const [rows] = await db.execute('SELECT * FROM users WHERE username = ?', [username]);
+    if (rows.length > 0 && await bcrypt.compare(password, rows[0].password)) {
+      const role = rows[0].role;
+      req.session.user = { username, role };
+      res.render('dashboard', { username, role });
+    } else {
+      res.status(401).send('Invalid credentials');
     }
-  });
+  } catch (error) {
+    res.status(500).send('Error during login');
+  }
+});
 
 app.post('/register', async (req, res) => {
   const { username, password, inviteCode } = req.body;
@@ -170,6 +179,23 @@ app.post('/delete/:directory/:file', (req, res) => {
     }
     res.redirect(`/files/${directory}`);
   });
+});
+
+app.post('/generate-invite', async (req, res) => {
+  const { user } = req.session;
+  if (!user || user.role !== 'admin') {
+    return res.status(403).send('Access denied');
+  }
+  
+  const { role } = req.body;
+  const inviteCode = crypto.randomBytes(16).toString('hex'); // Generate a random invite code
+
+  try {
+    await db.execute('INSERT INTO invites (code, role, used) VALUES (?, ?, 0)', [inviteCode, role]);
+    res.send(`Invite code generated: ${inviteCode}`);
+  } catch (error) {
+    res.status(500).send('Error generating invite code');
+  }
 });
 
 app.use((err, req, res, next) => {

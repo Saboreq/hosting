@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin Panel</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Admin Panel</h1>
+    <form action="/generate-invite" method="post">
+      <label for="role">Invite Code Role:</label>
+      <select name="role" id="role">
+        <option value="admin">Admin</option>
+        <option value="member">Member</option>
+      </select>
+      <button type="submit">Generate Invite Code</button>
+    </form>
+    <a href="/dashboard" class="btn-link">Back to Dashboard</a>
+  </div>
+</body>
+</html>

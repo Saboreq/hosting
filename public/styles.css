@@ -20,25 +20,18 @@ h1 {
 }
 
 form {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  display: inline-block;
   background: #1e1e1e;
   padding: 20px;
   border-radius: 10px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  margin-bottom: 10px;
-  width: fit-content;
-  padding: 20px;
+  margin: 10px;
 }
 
-ul {
-  list-style: none;
-  padding: 0;
-}
-
-li {
-  margin-bottom: 10px;
+.horizontal-forms {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
 }
 
 input, button {
@@ -46,11 +39,9 @@ input, button {
   color: #ffffff;
   border: none;
   padding: 10px 15px;
-  margin: 5px 0;
+  margin: 5px;
   border-radius: 5px;
   font-size: 1em;
-  width: auto;
-  max-width: 100%;
 }
 
 input:focus, button:focus {
@@ -63,7 +54,6 @@ button {
   background-color: #bb86fc;
   color: #121212;
   transition: background-color 0.3s;
-  white-space: nowrap;
 }
 
 button:hover {
@@ -79,9 +69,7 @@ button:hover {
   border-radius: 5px;
   text-decoration: none;
   font-size: 1em;
-  margin: 5px 0;
   transition: background-color 0.3s;
-  white-space: nowrap;
 }
 
 .btn-link:hover {
