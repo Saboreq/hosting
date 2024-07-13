@@ -188,11 +188,11 @@ app.post('/generate-invite', async (req, res) => {
   }
   
   const { role } = req.body;
-  const inviteCode = crypto.randomBytes(16).toString('hex'); // Generate a random invite code
+  const inviteCode = crypto.randomBytes(8).toString('hex'); // Generate a random invite code
 
   try {
     await db.execute('INSERT INTO invites (code, role, used) VALUES (?, ?, 0)', [inviteCode, role]);
-    res.send(`Invite code generated: ${inviteCode}`);
+    res.send(`Invite code generated: ${inviteCode}`); // Use backticks and ${} for interpolation
   } catch (error) {
     res.status(500).send('Error generating invite code');
   }

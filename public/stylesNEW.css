@@ -1,0 +1,87 @@
+/* styles.css */
+
+/* Basic Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Arial', sans-serif;
+  background-color: #0d0d0d;
+  color: #e0e0e0;
+  line-height: 1.6;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+/* Container */
+.container {
+  background: linear-gradient(145deg, #1e1e1e, #2a2a2a);
+  padding: 2em;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+  width: 90%;
+  max-width: 600px;
+  margin: 1em;
+  text-align: center;
+  transition: transform 0.3s ease;
+}
+
+.container:hover {
+  transform: translateY(-5px);
+}
+
+/* Headings */
+h1 {
+  margin-bottom: 1em;
+  color: #ffffff;
+  font-weight: 300;
+  font-size: 2em;
+}
+
+/* Forms */
+form {
+  margin-bottom: 1em;
+}
+
+input[type="text"],
+input[type="password"],
+input[type="file"],
+select {
+  width: 100%;
+  padding: 0.75em;
+  margin: 0.5em 0;
+  border: 1px solid #444;
+  border-radius: 8px;
+  background: #333;
+  color: #e0e0e0;
+  transition: border 0.3s ease, background 0.3s ease;
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus,
+input[type="file"]:focus,
+select:focus {
+  border-color: #6200ea;
+  background: #444;
+}
+
+button {
+  background: linear-gradient(145deg, #6200ea, #3700b3);
+  color: #ffffff;
+  padding: 0.75em 1.5em;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.3s ease;
+  margin-top: 1em;
+}
+
+button:hover {
+  background: linear-gradient(145deg, #3700b3, #6200ea);
+  transform: translateY(-3px);
+}
